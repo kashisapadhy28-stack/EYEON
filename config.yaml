@@ -1,0 +1,66 @@
+project:
+  name: "EYEON"
+  description: "Intelligent Object & Person Tracking System"
+
+detection:
+  model: "models/yolo11n.pt"
+  image_size: 640
+  device: "auto"
+  confidence:
+    person: 0.40
+    object: 0.25
+  classes:
+    person: [person]
+    objects: [backpack, handbag, suitcase, cell phone, laptop, bottle]
+
+tracking:
+  tracker: "bytetrack.yaml"
+  track_buffer: 30
+
+video:
+  type: "folder"
+  source: "data/videos"
+  output: "data/processed"
+  save_annotated: true
+
+association:
+  weights:
+    overlap: 0.4
+    distance: 0.3
+    body_region: 0.2
+    motion: 0.1
+  min_score: 0.35
+  voting_window: 15
+  voting_ratio: 0.70
+  owner_timeout_seconds: 5
+
+zones:
+  enabled: true
+  list:
+    - name: "Entrance"
+      weight: 0.8
+      polygon: [[0, 300], [400, 300], [400, 720], [0, 720]]
+    - name: "Counter"
+      weight: 0.5
+      polygon: [[400, 300], [900, 300], [900, 720], [400, 720]]
+
+risk:
+  enabled: true
+  weights:
+    object_confidence: 0.35
+    zone: 0.25
+    association_stability: 0.20
+    dwell_time: 0.20
+  levels:
+    medium: 0.40
+    high: 0.70
+  confirm_frames: 15
+  alert_cooldown_seconds: 10
+
+database:
+  path: "data/eyeon.db"
+  snapshots: "data/alerts"
+
+dashboard:
+  enabled: true
+  port: 8000
